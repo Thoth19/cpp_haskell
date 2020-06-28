@@ -203,6 +203,14 @@ struct GEQ {
 	using type = typename OR<eq_sub, gt_sub>::type;
 };
 
+// TODO
+// template <bool Condition, class T1, class T2>
+// struct lazy_conditional {
+// 	using lazy_t1 = lazy_template<NOP, T1>;
+// 	using lazy_t2 = lazy_template<NOP, T2>;
+// 	using type = typename std::conditional<Condition, typename lazy_t1::instantiated, typename lazy_t2::instantiated>::type;
+// };
+
 // Mod requires better errors or better sense of GT and LT
 template<class T1, class T2>
 struct Mod
