@@ -37,8 +37,11 @@ struct Add<Succ<T1>, T2> {
 	using type = Succ<typename Add<T1, T2>::type>;
 };
 
-template<class T1, class T2>
-struct Sub;
+template <class T1, class T2>
+struct Sub {
+	using type = Undefined;
+};
+
 template<>
 struct Sub<Zero, Zero> {
 	using type = Zero;
@@ -55,21 +58,15 @@ template<class T1, class T2>
 struct Sub<Succ<T1>, Succ<T2>> {
 	using type = typename Sub<T1, T2>::type;
 };
-template<>
-struct Sub<class T1, class T2> {
-	using type = Undefined;
-};
 
-template<int>
-struct pretty_num;
+template<int i>
+struct pretty_num {
+ 	using type = Succ<typename pretty_num<i-1>::type>;
+};
 template<>
 struct pretty_num<0> {
  	using type = Zero;
 };
-template<int i>
-struct pretty_num {
- 	using type = Succ<typename pretty_num<i-1>::type>;
- };
 
 template<class T1, class T2>
 struct Mult;
@@ -194,24 +191,9 @@ struct AND<std::false_type, std::false_type> {
 };
 
 // !(!a && !b) == (a || b)
-
 template <class T1, class T2>
-struct OR{};
-template<>
-struct OR<std::true_type, std::true_type> {
-	using type = std::true_type;
-};
-template<>
-struct OR<std::true_type, std::false_type> {
-	using type = std::true_type;
-};
-template<>
-struct OR<std::false_type, std::true_type> {
-	using type = std::true_type;
-};
-template<>
-struct OR<std::false_type, std::false_type> {
-	using type = std::false_type;
+struct OR{
+	using type = typename NOT<typename AND<typename NOT<T1>::type, typename NOT<T2>::type>::type>::type;
 };
 
 template <class T1, class T2>
