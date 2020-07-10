@@ -4,7 +4,6 @@
 
 #define test_value 27 
 #define num_trials1 10000000
-#define num_trials2 1000000
 // 27 -> 111
 
 template
@@ -355,87 +354,6 @@ double time_function(int(*foo)(int), int x) {
 	return elapsed_seconds.count();
 }
 
-double time_range_function(int(*foo)(int), int x, bool print) {
-	auto start = std::chrono::steady_clock::now();
-	for (int i = 0; i < num_trials2; ++i)
-	{
-		for (int j = 1; j <= x; ++j)
-		{
-			if (print){
-			    std::cout << "Foo took " << j << " and got " << foo(j) << std::endl;
-			} else {
-				foo(j);
-			}
-		}
-	}
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end-start;
-	return elapsed_seconds.count();
-}
-
-#pragma GCC diagnostic ignored "-Wunused-value"
-template<int high>
-void do_many_accums(bool print) {
-	if (print)
-	{
-		std::cout << "Foo took " << 1 << " and got " << accum<num_steps<pretty_num<1>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 2 << " and got " << accum<num_steps<pretty_num<2>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 3 << " and got " << accum<num_steps<pretty_num<3>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 4 << " and got " << accum<num_steps<pretty_num<4>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 5 << " and got " << accum<num_steps<pretty_num<5>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 6 << " and got " << accum<num_steps<pretty_num<6>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 7 << " and got " << accum<num_steps<pretty_num<7>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 8 << " and got " << accum<num_steps<pretty_num<8>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 9 << " and got " << accum<num_steps<pretty_num<9>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 10 << " and got " << accum<num_steps<pretty_num<10>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 11 << " and got " << accum<num_steps<pretty_num<11>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 12 << " and got " << accum<num_steps<pretty_num<12>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 13 << " and got " << accum<num_steps<pretty_num<13>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 14 << " and got " << accum<num_steps<pretty_num<14>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 15 << " and got " << accum<num_steps<pretty_num<15>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 16 << " and got " << accum<num_steps<pretty_num<16>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 17 << " and got " << accum<num_steps<pretty_num<17>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 18 << " and got " << accum<num_steps<pretty_num<18>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 19 << " and got " << accum<num_steps<pretty_num<19>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 20 << " and got " << accum<num_steps<pretty_num<20>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 21 << " and got " << accum<num_steps<pretty_num<21>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 22 << " and got " << accum<num_steps<pretty_num<22>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 23 << " and got " << accum<num_steps<pretty_num<23>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 24 << " and got " << accum<num_steps<pretty_num<24>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 25 << " and got " << accum<num_steps<pretty_num<25>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 26 << " and got " << accum<num_steps<pretty_num<26>::type>::type>().inside << std::endl;
-		std::cout << "Foo took " << 27 << " and got " << accum<num_steps<pretty_num<27>::type>::type>().inside << std::endl;
-	} else {
-		accum<num_steps<pretty_num<1>::type>::type>().inside;
-		accum<num_steps<pretty_num<2>::type>::type>().inside;
-		accum<num_steps<pretty_num<3>::type>::type>().inside;
-		accum<num_steps<pretty_num<4>::type>::type>().inside;
-		accum<num_steps<pretty_num<5>::type>::type>().inside;
-		accum<num_steps<pretty_num<6>::type>::type>().inside;
-		accum<num_steps<pretty_num<7>::type>::type>().inside;
-		accum<num_steps<pretty_num<8>::type>::type>().inside;
-		accum<num_steps<pretty_num<9>::type>::type>().inside;
-		accum<num_steps<pretty_num<10>::type>::type>().inside;
-		accum<num_steps<pretty_num<11>::type>::type>().inside;
-		accum<num_steps<pretty_num<12>::type>::type>().inside;
-		accum<num_steps<pretty_num<13>::type>::type>().inside;
-		accum<num_steps<pretty_num<14>::type>::type>().inside;
-		accum<num_steps<pretty_num<15>::type>::type>().inside;
-		accum<num_steps<pretty_num<16>::type>::type>().inside;
-		accum<num_steps<pretty_num<17>::type>::type>().inside;
-		accum<num_steps<pretty_num<18>::type>::type>().inside;
-		accum<num_steps<pretty_num<19>::type>::type>().inside;
-		accum<num_steps<pretty_num<20>::type>::type>().inside;
-		accum<num_steps<pretty_num<21>::type>::type>().inside;
-		accum<num_steps<pretty_num<22>::type>::type>().inside;
-		accum<num_steps<pretty_num<23>::type>::type>().inside;
-		accum<num_steps<pretty_num<24>::type>::type>().inside;
-		accum<num_steps<pretty_num<25>::type>::type>().inside;
-		accum<num_steps<pretty_num<26>::type>::type>().inside;
-		accum<num_steps<pretty_num<27>::type>::type>().inside;	
-	}
-}
-
 int main()
 {
 	std::cout << "Test" << std::endl;
@@ -570,18 +488,5 @@ int main()
     std::cout << elapsed_seconds.count() << std::endl;
 	
 	// Possible bug in clang at test_value 73?
-
-    std::cout << "While2   : " << time_range_function(&sane_num_steps, test_value, false) << std::endl;
-	std::cout << "Recurse2 : " << time_range_function(&sane_recur_num_steps, test_value, false) << std::endl;
-	auto start2 = std::chrono::steady_clock::now();
-	for (int i = 0; i < num_trials2; ++i)
-	{
-		do_many_accums<test_value>(false);
-	}
-    std::cout << "Compile2 : " << accum<num_steps<pretty_num<test_value>::type>::type>().inside << " : ";
-    auto end2 = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed_seconds2 = end2-start2;
-    std::cout << elapsed_seconds2.count() << std::endl;
-
 	return 0;
 }
