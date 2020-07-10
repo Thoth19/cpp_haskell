@@ -229,10 +229,75 @@ struct Mod<Zero, Zero>
 template<class T>
 struct Mod<Zero, T>
 {
-	using type = Zero;	
+	using type = Zero;
 };
 
+template<class ...elements> struct Tuple{};
 
+
+template <class peano, class ...Ts> struct GetElem {
+	template <class U, class ...Us> struct helper {
+		using lazy_car = lazy_template<NOP, U>;
+		using lazy_cdr = lazy_template<Tuple, Us...>;
+	};
+	template<class T> struct extract_elem {
+		using type = T;
+	};
+	template<class T> struct extract_elem<Tuple<T>> {
+		using type = T;
+	};
+	using internal = helper<Ts...>;
+	using car_or_cdr = typename std::conditional<std::is_same<peano, Zero>::value,
+										         typename internal::lazy_car::instantiated,
+										         typename internal::lazy_cdr::instantiated>::type::type;
+	// using result = typename std::conditional<std::is_same<peano, Zero>::value,
+	// 									         car_or_cdr,
+	// 									         typename GetElem(typename Sub<peano, Succ<Zero>>, car_or_cdr>>::type::type;
+    // Remove wrapper tuple
+    using type = typename extract_elem<car_or_cdr>::type;
+};
+
+template<int i, class ...args>
+struct Board {
+	using size = typename pretty_num<i>::type;
+	using elems = Tuple<args...>;
+};
+
+template <class T>
+struct isEven {
+	using type = typename EQ<typename Mod<T, typename pretty_num<2>::type>::type,Zero>::type;
+};
+
+template <class T>
+struct isTwo {
+	using type = typename EQ<T, typename pretty_num<2>::type>::type;
+};
+
+template <class T>
+struct next {
+	using lazy_even = lazy_template<Div, T, typename pretty_num<2>::type>;
+	using lazy_odd = lazy_template<Add, typename Mult<T, typename pretty_num<3>::type>::type, typename pretty_num<1>::type>;
+	using type = typename std::conditional<isEven<T>::type::value,
+	                               typename lazy_even::instantiated,
+	                               typename lazy_odd::instantiated>::type::type;
+};
+template<>
+struct next<Zero> {
+	using type = Undefined;
+};
+
+template<class T>
+struct num_steps {
+	using type = typename Add<typename pretty_num<1>::type, typename num_steps<typename next<T>::type>::type>::type;
+};
+template<>
+struct num_steps<Zero> {
+	using type = Undefined;
+};
+template<>
+struct num_steps<Succ<Zero>> {
+	using type = Zero;
+};
 
 int main()
 {
@@ -283,6 +348,7 @@ int main()
 	static_assert((std::is_same<Div<Zero, Zero>::type, Indeterminate>::value), "0/0 = Indeterminate");
 	static_assert((!std::is_same<Div<Zero, Zero>::type, Succ<Zero>>::value), "0/0 != 1");
 	static_assert((std::is_same<Div<Succ<Zero>, Zero>::type, Undefined>::value), "1/0 = Undefined");
+	static_assert((std::is_same<Div<Succ<Zero>, Succ<Zero>>::type, Succ<Zero>>::value), "1/1 = 1");
 	static_assert((std::is_same<Div<pretty_num<10>::type, pretty_num<2>::type>::type, pretty_num<5>::type>::value), "10 / 2 = 5");
 	// TODO make errors generic?
 	// static_assert((std::is_same<Div<pretty_num<2>::type, pretty_num<10>::type>::type, Undefined>::value), "2 / 10 = Undefined");
@@ -296,6 +362,7 @@ int main()
 	static_assert((std::is_same<EQ<pretty_num<1>::type, pretty_num<1>::type>::type, std::true_type>::value), "1==1 true");
 	static_assert((std::is_same<EQ<pretty_num<1>::type, pretty_num<2>::type>::type, std::false_type>::value), "1==2 false");
 	static_assert((std::is_same<EQ<pretty_num<2>::type, pretty_num<1>::type>::type, std::false_type>::value), "2==1 false");
+	static_assert((EQ<pretty_num<0>::type, pretty_num<0>::type>::type::value), "0==0");
 	static_assert((std::is_same<GEQ<pretty_num<0>::type, pretty_num<0>::type>::type, std::true_type>::value), "0>=0 true");
 	static_assert((std::is_same<GEQ<pretty_num<1>::type, pretty_num<0>::type>::type, std::true_type>::value), "1>=0 true");
 	static_assert((std::is_same<GEQ<pretty_num<0>::type, pretty_num<1>::type>::type, std::false_type>::value), "0>=1 false");
@@ -313,6 +380,33 @@ int main()
 	static_assert((std::is_same<Mod<pretty_num<2>::type, pretty_num<3>::type>::type, pretty_num<2>::type>::value), "2 % 3 = 2");
 	static_assert((std::is_same<Mod<pretty_num<4>::type, pretty_num<3>::type>::type, Mod<pretty_num<1>::type, pretty_num<3>::type>::type>::value), "4 % 3 = 1 % 3");
 	static_assert((std::is_same<Mod<pretty_num<4>::type, pretty_num<3>::type>::type, pretty_num<1>::type>::value), "4 % 3 = 1");
+
+	static_assert((!std::is_same<Tuple<std::true_type>, Tuple<std::false_type>>::value), "{true} != {false}");
+	static_assert((!std::is_same<Tuple<std::true_type, std::true_type>, Tuple<std::true_type, std::false_type>>::value), "{true, true} != {true, false}");
+	static_assert((std::is_same<GetElem<pretty_num<0>::type, Tuple<std::true_type>>::type, std::true_type>::value), "{true}[0] == true");
+	// static_assert((std::is_same<GetElem<pretty_num<1>::type, Tuple<std::true_type, std::false_type>>::type, std::false_type>::value), "{true, false}[1] == false");
+
+	// isTwo
+	static_assert((std::is_same<isTwo<pretty_num<2>::type>::type, std::true_type>::value), "2 is Two");
+	// isEven
+	static_assert((std::is_same<isEven<pretty_num<2>::type>::type, std::true_type>::value), "2 is Even");
+	static_assert((std::is_same<isEven<pretty_num<1>::type>::type, std::false_type>::value), "1 is not Even");
+	static_assert((std::is_same<isEven<pretty_num<3>::type>::type, std::false_type>::value), "3 is not Even");
+	static_assert((std::is_same<isEven<pretty_num<10>::type>::type, std::true_type>::value), "10 is Even");
+
+	// Collatz Next Function
+	static_assert((std::is_same<next<pretty_num<0>::type>::type, Undefined>::value), "next(0) is Undefined");
+	static_assert((std::is_same<next<pretty_num<2>::type>::type, pretty_num<1>::type>::value), "next(2) is 1");
+	static_assert((std::is_same<next<pretty_num<4>::type>::type, pretty_num<2>::type>::value), "next(4) is 2");
+	static_assert((std::is_same<next<pretty_num<1>::type>::type, pretty_num<4>::type>::value), "next(1) is 4");
+	static_assert((std::is_same<next<pretty_num<3>::type>::type, pretty_num<10>::type>::value), "next(3) is 10");
+
+	// Collatz Count Function
+	static_assert((std::is_same<num_steps<pretty_num<1>::type>::type, pretty_num<0>::type>::value), "num_steps(1) is 0");
+	static_assert((std::is_same<num_steps<pretty_num<0>::type>::type, Undefined>::value), "num_steps(0) is Undefined");
+	static_assert((std::is_same<num_steps<pretty_num<2>::type>::type, pretty_num<1>::type>::value), "num_steps(2) is 1");
+	static_assert((std::is_same<num_steps<pretty_num<3>::type>::type, pretty_num<7>::type>::value), "num_steps(3) is 7");
+	
 
 	return 0;
 }
