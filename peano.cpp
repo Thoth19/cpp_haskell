@@ -67,6 +67,17 @@ struct pretty_num<0> {
  	using type = Zero;
 };
 
+template<class T>
+struct accum {};
+template<>
+struct accum<Zero> {
+	int inside = 0;
+};
+template<class T>
+struct accum<Succ<T>> {
+	int inside = 1 + accum<T>().inside;
+};
+
 template<class T1, class T2>
 struct Mult;
 template<>
@@ -406,6 +417,12 @@ int main()
 	static_assert((std::is_same<num_steps<pretty_num<0>::type>::type, Undefined>::value), "num_steps(0) is Undefined");
 	static_assert((std::is_same<num_steps<pretty_num<2>::type>::type, pretty_num<1>::type>::value), "num_steps(2) is 1");
 	static_assert((std::is_same<num_steps<pretty_num<3>::type>::type, pretty_num<7>::type>::value), "num_steps(3) is 7");
+	
+	// Accum
+	assert(accum<pretty_num<3>::type>().inside == 3);
+	std::cout << accum<pretty_num<42>::type>().inside << std::endl;
+	std::cout << "num_steps(3) is " << accum<num_steps<pretty_num<3>::type>::type>().inside << std::endl;
+	// In order to print at compile time we need a feature from gcc and this was done with clang. By the axiom of laziness we won't print at compile time
 	
 
 	return 0;
