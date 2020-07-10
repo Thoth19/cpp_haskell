@@ -3,8 +3,9 @@
 #include <chrono>
 
 #define test_value 27 
-#define num_trials1 10000000
+#define num_trials1 100000000
 // 27 -> 111
+// try 217123? or maybe you lose
 
 template
 <
@@ -343,13 +344,14 @@ int sane_recur_num_steps(int x) {
 
 //timing our code
 double time_function(int(*foo)(int), int x) {
+	int ans;
 	auto start = std::chrono::steady_clock::now();
 	for (int i = 0; i < num_trials1; ++i)
 	{
-		foo(x);
+		ans = foo(x);
 	}
-    std::cout << foo(x) << " : ";
     auto end = std::chrono::steady_clock::now();
+    std::cout << " output " << ans << " : ";
     std::chrono::duration<double> elapsed_seconds = end-start;
 	return elapsed_seconds.count();
 }
@@ -474,16 +476,16 @@ int main()
 	assert(sane_num_steps(3) == 7);
 	assert(sane_recur_num_steps(3) == 7);
 	
-	std::cout << "While   : " << time_function(&sane_num_steps, test_value) << std::endl;
-	std::cout << "Recurse : " << time_function(&sane_recur_num_steps, test_value) << std::endl;
-	auto start = std::chrono::steady_clock::now();
+	std::cout << "While   : input " << time_function(&sane_num_steps, test_value) << std::endl;
+	std::cout << "Recurse : input " << time_function(&sane_recur_num_steps, test_value) << std::endl;
 	int ans;
+	auto start = std::chrono::steady_clock::now();
 	for (int i = 0; i < num_trials1; ++i)
 	{
 		ans = accum<num_steps<pretty_num<test_value>::type>::type>().inside;
 	}
-    std::cout << "Compile : " << ans << " : ";
     auto end = std::chrono::steady_clock::now();
+    std::cout << "Compile : " << ans << " : ";
     std::chrono::duration<double> elapsed_seconds = end-start;
     std::cout << elapsed_seconds.count() << std::endl;
 	
